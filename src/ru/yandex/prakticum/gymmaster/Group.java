@@ -1,17 +1,16 @@
 package ru.yandex.prakticum.gymmaster;
 
+import java.util.Objects;
+
 public class Group {
     //название группы
     private String title;
     //тип (взрослая или детская)
     private Age age;
-    //длительность (в минутах)
-    private int duration;
 
-    public Group(String title, Age age, int duration) {
+    public Group(String title, Age age) {
         this.title = title;
         this.age = age;
-        this.duration = duration;
     }
 
     public String getTitle() {
@@ -22,7 +21,15 @@ public class Group {
         return age;
     }
 
-    public int getDuration() {
-        return duration;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return Objects.equals(title, group.title) && age == group.age;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, age);
     }
 }

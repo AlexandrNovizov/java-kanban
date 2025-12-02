@@ -1,21 +1,26 @@
 package ru.yandex.prakticum.gymmaster;
 
-public class TrainingSession {
+import java.util.Objects;
+
+public class TrainingSession implements Comparable<TrainingSession> {
 
     //группа
-    private Group group;
+    private final Group group;
     //тренер
-    private Coach coach;
+    private final Coach coach;
     //день недели
-    private DayOfWeek dayOfWeek;
+    private final DayOfWeek dayOfWeek;
     //время начала занятия
-    private TimeOfDay timeOfDay;
+    private final TimeOfDay timeOfDay;
+    //длительность
+    private final int duration;
 
-    public TrainingSession(Group group, Coach coach, DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
+    public TrainingSession(Group group, Coach coach, DayOfWeek dayOfWeek, TimeOfDay timeOfDay, int duration) {
         this.group = group;
         this.coach = coach;
         this.dayOfWeek = dayOfWeek;
         this.timeOfDay = timeOfDay;
+        this.duration = duration;
     }
 
     public Group getGroup() {
@@ -32,5 +37,31 @@ public class TrainingSession {
 
     public TimeOfDay getTimeOfDay() {
         return timeOfDay;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    @Override
+    public int compareTo(TrainingSession o) {
+        int result = dayOfWeek.compareTo(o.dayOfWeek);
+        if (dayOfWeek.compareTo(o.dayOfWeek) > 0)
+            result = timeOfDay.compareTo(o.timeOfDay);
+
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        TrainingSession that = (TrainingSession) o;
+        return Objects.equals(group, that.group) && Objects.equals(coach, that.coach) && dayOfWeek == that.dayOfWeek
+                && Objects.equals(timeOfDay, that.timeOfDay) && duration == that.duration;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(group, coach, dayOfWeek, timeOfDay, duration);
     }
 }

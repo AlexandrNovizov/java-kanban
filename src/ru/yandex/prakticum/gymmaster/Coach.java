@@ -1,13 +1,15 @@
 package ru.yandex.prakticum.gymmaster;
 
+import java.util.Objects;
+
 public class Coach {
 
     //фамилия
-    private String surname;
+    private final String surname;
     //имя
-    private String name;
+    private final String name;
     //отчество
-    private String middleName;
+    private final String middleName;
 
     public Coach(String surname, String name, String middleName) {
         this.surname = surname;
@@ -25,5 +27,17 @@ public class Coach {
 
     public String getMiddleName() {
         return middleName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Coach coach = (Coach) o;
+        return Objects.equals(surname, coach.surname) && Objects.equals(name, coach.name) && Objects.equals(middleName, coach.middleName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(surname, name, middleName);
     }
 }
