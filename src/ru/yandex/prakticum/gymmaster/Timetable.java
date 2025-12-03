@@ -6,9 +6,9 @@ public class Timetable {
 
     private enum CheckType { COACH, GROUP }
 
-    private final HashMap<Coach, Integer> countOfTrainings = new HashMap<>();
+    private final Map<Coach, Integer> countOfTrainings = new HashMap<>();
 
-    private final HashMap<DayOfWeek, TreeMap<TimeOfDay, HashSet<TrainingSession>>> timetable = new HashMap<>();
+    private final Map<DayOfWeek, TreeMap<TimeOfDay, HashSet<TrainingSession>>> timetable = new HashMap<>();
 
     public void addNewTrainingSession(TrainingSession trainingSession) {
         DayOfWeek dayOfWeek = trainingSession.getDayOfWeek();
@@ -34,14 +34,14 @@ public class Timetable {
         return timetable.getOrDefault(dayOfWeek, new TreeMap<>());
     }
 
-    public HashSet<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
+    public Set<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
         TreeMap<TimeOfDay, HashSet<TrainingSession>> trainingSessionsForDay = timetable.getOrDefault(
                 dayOfWeek, new TreeMap<>());
         return trainingSessionsForDay.getOrDefault(timeOfDay, new HashSet<>());
     }
 
-    public List<CounterOfTrainings> getCountByCoaches() {
-        return CounterOfTrainings.toSortedList(countOfTrainings);
+    public Set<CounterOfTrainings> getCountByCoaches() {
+        return toSortedSet(countOfTrainings);
     }
 
     private boolean isIntersections(TrainingSession session,
@@ -57,19 +57,19 @@ public class Timetable {
 
             // отбираем тренировки конкретного тренера
             for (TrainingSession train : trainingsForDay.get(trainTime)) {
-                boolean condition;
+                boolean isSameGroupOrCoach;
                 String errorMessage;
                 switch (type) {
                     case GROUP -> {
-                        condition = train.getGroup().equals(session.getGroup());
+                        isSameGroupOrCoach = train.getGroup().equals(session.getGroup());
                         errorMessage = "Невозможно добавить тренировку, группа занята";
                     }
                     case null, default -> {
-                        condition = train.getCoach().equals(session.getCoach());
+                        isSameGroupOrCoach = train.getCoach().equals(session.getCoach());
                         errorMessage = "Невозможно добавить тренировку, тренер занят";
                     }
                 }
-                if (condition) {
+                if (isSameGroupOrCoach) {
                     TimeOfDay currTrainStart = train.getTimeOfDay();
                     TimeOfDay currTrainEnd = train.getTimeOfDay().plusMinutes(train.getDuration());
 
@@ -93,6 +93,14 @@ public class Timetable {
     }
 
     private void incrementCounter(Coach coach) {
-        countOfTrainings.put(coach, countOfTrainings.getOrDefault(coach, 0) + 1);
+        countOfTrainings.compute(coach, (k, v) -> (v == null) ? 1 : v + 1);
+    }
+
+    public static Set<CounterOfTrainings> toSortedSet(Map<Coach, Integer> map) {
+        TreeSet<CounterOfTrainings> result = new TreeSet<>();
+        for (Map.Entry<Coach, Integer> entry : map.entrySet())
+            result.add(new CounterOfTrainings(entry.getKey(), entry.getValue()));
+
+        return result.reversed();
     }
 }

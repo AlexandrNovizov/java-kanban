@@ -46,8 +46,9 @@ public class TrainingSession implements Comparable<TrainingSession> {
     @Override
     public int compareTo(TrainingSession o) {
         int result = dayOfWeek.compareTo(o.dayOfWeek);
-        if (dayOfWeek.compareTo(o.dayOfWeek) > 0)
+        if (dayOfWeek.compareTo(o.dayOfWeek) > 0) {
             result = timeOfDay.compareTo(o.timeOfDay);
+        }
 
         return result;
     }

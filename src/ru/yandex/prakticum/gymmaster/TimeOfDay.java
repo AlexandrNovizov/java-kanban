@@ -38,8 +38,9 @@ public class TimeOfDay implements Comparable<TimeOfDay> {
     @Override
     public int compareTo(TimeOfDay o) {
         int result = Integer.compare(hours, o.hours);
-        if (result == 0)
+        if (result == 0) {
             result = Integer.compare(minutes, o.minutes);
+        }
 
         return result;
     }

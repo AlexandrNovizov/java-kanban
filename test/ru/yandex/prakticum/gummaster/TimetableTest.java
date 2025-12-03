@@ -9,7 +9,7 @@ import ru.yandex.prakticum.gymmaster.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Set;
 
 public class TimetableTest {
@@ -201,6 +201,27 @@ public class TimetableTest {
     }
 
     @Test
+    void testAddTrainingWithSameStartTimeWithExistingCoachTrain() {
+        Coach coach = new Coach("Васильев", "Николай", "Сергеевич");
+        Group firstGroup = new Group("Акробатика для детей", Age.CHILD);
+        Group secondGroup = new Group("Гимнастика для взрослых", Age.ADULT);
+        DayOfWeek trainDay = DayOfWeek.MONDAY;
+        TimeOfDay trainTime = new TimeOfDay(13, 0);
+
+        timetable.addNewTrainingSession(
+                new TrainingSession(firstGroup, coach, trainDay, trainTime, 60)
+        );
+
+        timetable.addNewTrainingSession(
+                new TrainingSession(secondGroup, coach, trainDay, trainTime, 60)
+        );
+
+        assertEquals(1, timetable.getTrainingSessionsForDayAndTime(trainDay, trainTime).size());
+        String expected = "Невозможно добавить тренировку, тренер занят" + System.lineSeparator();
+        assertEquals(expected, outputStream.toString());
+    }
+
+    @Test
     void testAddTrainingStartTimeInsideExistingGroupTrain() {
         Coach firstCoach = new Coach("Васильев", "Николай", "Сергеевич");
         Coach secondCoach = new Coach("Смольников", "Виталий", "Алексеевич");
@@ -281,6 +302,27 @@ public class TimetableTest {
     }
 
     @Test
+    void testAddTrainingWithSameStartTimeWithExistingGroupTrain() {
+        Coach firstCoach = new Coach("Васильев", "Николай", "Сергеевич");
+        Coach secondCoach = new Coach("Смольников", "Виталий", "Алексеевич");
+        Group group = new Group("Акробатика для детей", Age.CHILD);
+        DayOfWeek trainDay = DayOfWeek.MONDAY;
+        TimeOfDay trainTime = new TimeOfDay(13, 0);
+
+        timetable.addNewTrainingSession(
+                new TrainingSession(group, firstCoach, trainDay, trainTime, 60)
+        );
+
+        timetable.addNewTrainingSession(
+                new TrainingSession(group, secondCoach, trainDay, trainTime, 60)
+        );
+
+        assertEquals(1, timetable.getTrainingSessionsForDayAndTime(trainDay, trainTime).size());
+        String expected = "Невозможно добавить тренировку, группа занята" + System.lineSeparator();
+        assertEquals(expected, outputStream.toString());
+    }
+
+    @Test
     void testGetCountByCoachesSortsByTrainingCountDescending() {
         Coach firstCoach = new Coach("Васильев", "Николай", "Сергеевич");
         Coach secondCoach = new Coach("Смольников", "Виталий", "Алексеевич");
@@ -312,19 +354,21 @@ public class TimetableTest {
             }
         }
 
-        List<CounterOfTrainings> sortedTrainings = timetable.getCountByCoaches();
+        Set<CounterOfTrainings> sortedTrainings = timetable.getCountByCoaches();
 
-        CounterOfTrainings counter = sortedTrainings.get(0);
+        Iterator<CounterOfTrainings> iterator = sortedTrainings.iterator();
+
+        CounterOfTrainings counter = iterator.next();
 
         assertEquals(thirdCoach, counter.getCoach());
         assertEquals(6, counter.getCountOfTrains());
 
-        counter = sortedTrainings.get(1);
+        counter = iterator.next();
 
         assertEquals(secondCoach, counter.getCoach());
         assertEquals(5, counter.getCountOfTrains());
 
-        counter = sortedTrainings.get(2);
+        counter = iterator.next();
 
         assertEquals(firstCoach, counter.getCoach());
         assertEquals(3, counter.getCountOfTrains());
